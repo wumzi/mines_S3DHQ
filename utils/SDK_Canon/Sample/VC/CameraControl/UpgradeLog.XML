@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="CameraControl">
+</Property><Property Name="Fichier solution" Value="C:\Users\13ernoul\Documents\GitHub\mines_S3DHQ\utils\SDK_Canon\Sample\VC\CameraControl\CameraControl.sln">
+</Property><Property Name="Date" Value="mardi 3 mars 2015">
+</Property><Property Name="Time" Value="14:50">
+</Property></Properties><Event ErrorLevel="0" Project="" Source="CameraControl.sln" Description="Fichier correctement sauvegardé en tant que C:\Users\13ernoul\Documents\GitHub\mines_S3DHQ\utils\SDK_Canon\Sample\VC\CameraControl\CameraControl.sln.old">
+</Event><Event ErrorLevel="0" Project="CameraControl" Source="CameraControl.vcproj" Description="Le déploiement Web sur le serveur IIS local IIS n'est plus pris en charge. L'outil de génération Déploiement Web a été supprimé des paramètres de votre projet.">
+</Event><Event ErrorLevel="1" Project="CameraControl" Source="CameraControl.vcproj" Description="Cette application a été mise à jour pour inclure les paramètres liés à la fonctionnalité Contrôle de compte d'utilisateur de Windows Vista. Par défaut, lorsqu'elle est exécutée sur Windows Vista avec le Contrôle de compte d'utilisateur activé, cette application est marquée pour s'exécuter avec les mêmes privilèges que le processus qui l'a lancée. Ce marquage empêche l'application de s'exécuter avec la virtualisation. Vous pouvez changer les paramètres du Contrôle de compte d'utilisateur dans les pages de propriétés du projet.">
+</Event><Event ErrorLevel="0" Project="CameraControl" Source="CameraControl.vcproj" Description="Fichier projet correctement sauvegardé en tant que 'C:\Users\13ernoul\Documents\GitHub\mines_S3DHQ\utils\SDK_Canon\Sample\VC\CameraControl\CameraControl.vcproj.8.00.old'.">
+</Event><Event ErrorLevel="0" Project="CameraControl" Source="CameraControl.vcproj" Description="Mise à niveau du projet terminée.">
+</Event><Event ErrorLevel="3" Project="CameraControl" Source="CameraControl.vcproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="CameraControl.sln" Description="Solution correctement convertie">
+</Event><Event ErrorLevel="3" Project="" Source="CameraControl.sln" Description="Converted">
+</Event></UpgradeLog>

@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "serialconnection.h"

@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CameraControl", "CameraControl.vcproj", "{15C3FC7B-BBAB-404C-8707-A04E17E373D6}"
 EndProject
 Global
