@@ -1,4 +1,5 @@
 #include <stdarg.h>
+/* Fonction émulant le printf classque du C pour la communication serie */
 void p(char *fmt, ... ){
         char buf[128]; // resulting string limited to 128 chars
         va_list args;
@@ -28,11 +29,12 @@ struct Acceleration {
   int x;
   int y;
   int z;
-};
+}; // les accelerations sont données en g.
 
 struct Acceleration acceleration;
 
 void mesAcceleration(){
+  /* Dans un monde magique */
   acceleration.z = (int)( - cos(xMotorPos) * 1000);
   acceleration.y = (int)( - sin(xMotorPos) * 1000);
   acceleration.x = 0;
@@ -47,6 +49,7 @@ void zMotor(float zPos){
 }
 
 void captLumiere(){
+  /* Les valeurs proposees n ont rien de reel */
   float natural = random(120, 255);
   lumiereMes.red = panneau1.red + panneau2.red + panneau2.red + natural;
   lumiereMes.green = panneau1.green + panneau2.green + panneau2.green + natural;
@@ -74,11 +77,6 @@ void setup(){
 
 void handleInput(String input){
   int len = input.length();
-
-  /*if (input.charAt(0) != '$' or input.charAt(len - 1) != '/'){
-    Serial.println("$ERROR : Requests begin with a $ and end with //");
-  } else {
-    Serial.println(input);*/
 
     switch (input.charAt(0)){
       case '0':
