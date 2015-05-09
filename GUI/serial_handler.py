@@ -33,8 +33,8 @@ class SerialHandler():
 			self.handleMessage(input)
 
 	def sendMessage(self, messageBrut):
-		messageBrut = str(messageBrut)
-		self.serial.write(bytes(messageBrut + "\n", encoding="utf-8"))
+		messageBrut = "$" + str(messageBrut) + "/\n"
+		self.serial.write(bytes(messageBrut, encoding="utf-8"))
 		print("OUTPUT : " + messageBrut)
 
 	def commandeMoteurs(self, positionVerticale=0, positionHorizontale=0):
