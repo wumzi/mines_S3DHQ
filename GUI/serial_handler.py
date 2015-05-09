@@ -1,17 +1,12 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-"""TODO : 	- synchronisation thread pour communication efficace
-			- interface de plus haut niveau
-			- interface graphique -> Java ? Responsive web bindé sur Django ?
-				\-> communication JPython ? Sockets ?
-"""
-
+import math
 import serial
 import threading
 import time
 
-CODEACTION = {'accelerometre': 5, 'mesure_lumiere': 6, 'panneau_sup': 2, 'laser': 1, 'panneau_lat_gauche': 3, 'moteur': 0, 'panneau_lat_droit': 4}
+CODEACTION = {'posmoteur': 1, 'accelerometre': 6, 'mesure_lumiere': 7, 'panneau_sup': 3, 'laser': 2, 'panneau_lat_gauche': 4, 'moteur': 0, 'panneau_lat_droit': 5}
 
 
 class FrameBrokenException(Exception):
@@ -20,60 +15,78 @@ class FrameBrokenException(Exception):
 class SerialHandler():
 	def __init__(self, device="/dev/ttyACM0", baudrate="9600"):
 		self.serial = serial.Serial(device, baudrate)
-		self.serial.flush()
+		self.serial.flushInput()
+		self.serial.flushOutput()
 
-		self.listener = threading.Thread(group=None, target=self.listen, name="listen_serial", args=(), kwargs=None)
-		self.listener.daemon = True
-		self.listener.start()
+		self.waiting = False
 
 	def listen(self):
-		while True:
-			input = self.serial.readline()
-			print("INPUT : " + str(input))
-			self.handleMessage(input)
+		input = self.serial.readline()
+		self.waiting = False
+		print("INPUT : " + str(input))
+		self.handleMessage(str(input))
 
 	def sendMessage(self, messageBrut):
-		messageBrut = "$" + str(messageBrut) + "/\n"
+		messageBrut = "$" + str(messageBrut) + "/"
+		while self.waiting:
+			time.sleep(0.01)
+		self.waiting = True
 		self.serial.write(bytes(messageBrut, encoding="utf-8"))
 		print("OUTPUT : " + messageBrut)
 
+		return self.listen()
+
+
 	def commandeMoteurs(self, positionVerticale=0, positionHorizontale=0):
 		"""" Commande angulaire des deux moteurs """
-		if not (positionVerticale in range(0,360) and positionHorizontale in range(0,360)):
-			raise Exception("Les positions doivent etre des entiers compris en 0 et 359")
+		if not (positionVerticale in range(0,180) and positionHorizontale in range(0,360)):
+			raise Exception("Bad positions")
 
 		positionVerticale, positionHorizontale = ('000{}'.format(color)[-3:] for color in (positionVerticale, positionHorizontale))
-		return self.sendMessage("{}{}{}".format(CODEACTION['moteur'], positionVerticale, positionHorizontale))
+		resp = self.sendMessage("{}{}{}".format(CODEACTION['moteur'], positionVerticale, positionHorizontale))
 
+
+		acceleration = self.mesureAccelerometre()
+		if acceleration[2] == 0:
+			return acceleration[1]/abs(acceleration[1]) * 90
+		return math.atan(acceleration[1] / acceleration[2]) * 180 / math.pi
 
 	def laser(self, status):
 		if status not in [True, False]:
 			raise Exception("Le statut pour le laser booleen")
-		return self.sendMessage("{}{}".format(CODEACTION['laser'], int(status)))
-
-	def laserOn(self):
-		return self.laser(True)
-
-	def laserOff(self):
-		return self.laser(False)
+		resp = self.sendMessage("{}{}".format(CODEACTION['laser'], int(status)))
+		return bool(resp[0])
 
 	def panneau(self, panneau, red, green, blue):
+		panneau += 3
 		if not (red in range(256) and green in range(256) and blue in range(256)):
 			raise Exception("Les couleurs sont codés en RGB de 0 a 255")
 
 		red, green, blue = ('000{}'.format(color)[-3:] for color in (red, green, blue))
 
-		return self.sendMessage("%s%s%s%s" % (panneau, red, green, blue))
+		resp = self.sendMessage("%s%s%s%s" % (panneau, red, green, blue))
+		return self.mesureLumiere()
 
 	def mesureAccelerometre(self):
-		return self.sendMessage(CODEACTION["accelerometre"])
+		resp = self.sendMessage(CODEACTION["accelerometre"])
+		return [float(x) for x in resp]
 
 	def mesureLumiere(self):
-		return self.sendMessage(CODEACTION["mesure_lumiere"])
-
+		resp = self.sendMessage(CODEACTION["mesure_lumiere"])
+		return sum([int(x) for x in resp])
 
 	def handleMessage(self, message):
-		pass
+		if message[0] != "$" or message[-1] != "/":
+			print("ERROR: inconsistent message")
+			return
+		elems = message[1:-1].split("_")
+		if elems[0] == "ERROR":
+			print("ERROR : " + ' '.join(message[1:])
+			return
+
+		return elems[2:]
+
+
 
 
 
@@ -86,12 +99,10 @@ if __name__ == '__main__':
 	else:
 		handler = SerialHandler()
 
-	handler.laserOn()
-	time.sleep(5)
+	handler.laser(True)
 	handler.mesureAccelerometre()
-	time.sleep(5)
-	handler.commandeMoteurs(244, 122)
-	time.sleep(5)
+	handler.panneau(0, 255, 255, 255)
+	handler.commandeMoteurs(122, 122)
 	handler.mesureAccelerometre()
 
 	handler.listener.join()
