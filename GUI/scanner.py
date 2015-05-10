@@ -19,6 +19,8 @@ class ScannerHandler():
 		self.camera = PhotoHandler("")
 		self.serial = SerialHandler(device, baudrate)
 
+		self.last_pos = (0, 0)
+
 		self.panneau1 = (0, 0, 0)
 		self.panneau2 = (0, 0, 0)
 		self.panneau3 = (0, 0, 0)
@@ -40,6 +42,7 @@ class ScannerHandler():
 					continue
 
 				real_z, x = self.reach_position(z, x)
+				self.last_pos = (real_z, x)
 
 				print("Taking picture for pos {} {}".format(z, x))
 				self.take_picture(real_z, z, x, laser=False)
@@ -64,9 +67,9 @@ class ScannerHandler():
 		self.panneau1, self.panneau2, self.panneau3 = panneau1, panneau2, panneau3
 		return self.serial.mesureLumiere()
 
+	def getlastpos(self):
+		return self.last_pos
 
-	def close(self):
-		self.serial.close()
 
 if __name__ == '__main__':
 	import sys
@@ -74,4 +77,4 @@ if __name__ == '__main__':
 	a = ScannerHandler()
 	#a.set_lights(panneau1 = (200, 100, 200))
 	a.run_scan()
-	a.close()
+	a.serial.close()
