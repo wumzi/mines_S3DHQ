@@ -18,13 +18,18 @@ class SerialHandler():
 		self.serial.flushInput()
 		self.serial.flushOutput()
 
-		self.waiting = False
+
+		self.waiting = True
+		self.serial.timeout = 2
+		self.listen()
+		self.serial.timeout = None
 
 	def listen(self):
-		input = self.serial.readline()
+		input = self.serial.readline().decode(encoding="utf-8")
 		self.waiting = False
-		print("INPUT : " + str(input))
-		self.handleMessage(str(input))
+		if input:
+			print("INPUT : " + input)
+			return self.handleMessage(input)
 
 	def sendMessage(self, messageBrut):
 		messageBrut = "$" + str(messageBrut) + "/"
@@ -39,7 +44,7 @@ class SerialHandler():
 
 	def commandeMoteurs(self, positionVerticale=0, positionHorizontale=0):
 		"""" Commande angulaire des deux moteurs """
-		if not (positionVerticale in range(0,180) and positionHorizontale in range(0,360)):
+		if not (positionVerticale in range(0,91) and positionHorizontale in range(0,361)):
 			raise Exception("Bad positions")
 
 		positionVerticale, positionHorizontale = ('000{}'.format(color)[-3:] for color in (positionVerticale, positionHorizontale))
@@ -48,7 +53,7 @@ class SerialHandler():
 
 		acceleration = self.mesureAccelerometre()
 		if acceleration[2] == 0:
-			return acceleration[1]/abs(acceleration[1]) * 90
+			return - acceleration[1]/abs(acceleration[1]) * 90
 		return math.atan(acceleration[1] / acceleration[2]) * 180 / math.pi
 
 	def laser(self, status):
@@ -65,7 +70,7 @@ class SerialHandler():
 		red, green, blue = ('000{}'.format(color)[-3:] for color in (red, green, blue))
 
 		resp = self.sendMessage("%s%s%s%s" % (panneau, red, green, blue))
-		return self.mesureLumiere()
+		return True
 
 	def mesureAccelerometre(self):
 		resp = self.sendMessage(CODEACTION["accelerometre"])
@@ -76,15 +81,20 @@ class SerialHandler():
 		return sum([int(x) for x in resp])
 
 	def handleMessage(self, message):
-		if message[0] != "$" or message[-1] != "/":
+		if message[0] != "$" or "/" not in message[-3:]:
 			print("ERROR: inconsistent message")
 			return
-		elems = message[1:-1].split("_")
+		message = message[1:].split("/")[0]
+		elems = message.split("_")
+
 		if elems[0] == "ERROR":
-			print("ERROR : " + ' '.join(message[1:])
+			print("ERROR : " + ' '.join(message))
 			return
 
 		return elems[2:]
+
+	def close(self):
+		self.serial.close()
 
 
 
