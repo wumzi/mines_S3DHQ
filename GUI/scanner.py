@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
+import xml.etree.ElementTree as ET
 
 from camera_control import CameraHandler
 from serial_handler import SerialHandler
@@ -16,6 +18,8 @@ class ScannerHandler():
 
 		self.camera = CameraHandler(model="canonEOS")
 		self.serial = SerialHandler(device, baudrate)
+
+		self.pause = False
 
 		self.last_position = (0, 0)
 
@@ -34,6 +38,9 @@ class ScannerHandler():
 		
 		for z in [z for z in range(91) if not z % 30]:
 			for x in [x for x in range(360) if not x % 30]:
+				while not self.pause:
+					time.sleep(1)
+
 				if (z, x) in self.already_photographed:
 					continue
 
@@ -42,7 +49,9 @@ class ScannerHandler():
 
 				filename = filenametpl.format(z, x, real_z, "{}")
 				self.take_picture(filename, laser=False)
+				time.sleep(1)
 				self.take_picture(filename, laser=True)
+				self.serial.laser(False)
 
 				self.already_photographed.append((z, x))
 
@@ -66,6 +75,12 @@ class ScannerHandler():
 
 	def get_last_position(self):
 		return self.last_position
+
+	def set_pause(self, pause):
+		self.pause = pause
+
+	def get_pause(self):
+		return self.pause
 
 
 
