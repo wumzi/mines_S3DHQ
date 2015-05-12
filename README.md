@@ -1,1 +1,2 @@
-# mines_S3DHQ
+# Projet Mécatronique Scanner 3DHQ
+

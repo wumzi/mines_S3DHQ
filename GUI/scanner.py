@@ -14,7 +14,7 @@ class ScannerHandler():
 			os.mkdir(folder)
 		os.chdir(folder)
 
-		self.camera = CameraHandler()
+		self.camera = CameraHandler(model="canonEOS")
 		self.serial = SerialHandler(device, baudrate)
 
 		self.last_position = (0, 0)

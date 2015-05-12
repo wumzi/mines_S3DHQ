@@ -26,7 +26,7 @@ Servo servoX;
 
 #define STEPS 100
 Stepper stepper(STEPS, 13, 12, 11, 10);
-LiquidCrystal_I2C lcd(0x27,16,2);
+//LiquidCrystal_I2C lcd(0x27,16,2);
 
 float xMotorPos;
 float zMotorPos;
@@ -56,8 +56,8 @@ struct Acceleration acceleration;
 
 void mesAcceleration(){
   /* Dans un monde magique */
-  acceleration.z = (int)( - cos(xMotorPos) * 1000);
-  acceleration.y = (int)( - sin(xMotorPos) * 1000);
+  acceleration.z = (int)( cos(xMotorPos/180 * 3.14159) * 1000);
+  acceleration.y = (int)( sin(xMotorPos/180 * 3.14159) * 1000);
   acceleration.x = 0;
 }
 
@@ -95,8 +95,8 @@ void updatePanneau(){
 }
 
 void setup(){
-  lcd.init();
-  lcd.backlight();
+  /*lcd.init();
+  lcd.backlight();*/
 
   Serial.begin(9600);
   Serial.println("$OK_ready/");
@@ -126,10 +126,10 @@ void setup(){
   captLumiere();
   mesAcceleration();
 
-  lcd.clear();
-  lcd.print("Ahahahaha");
+  /*lcd.clear();
+  lcd.print("m3ch4tr0niCs,");
   lcd.setCursor(0,1);
-  lcd.print("Kikooooo !");
+  lcd.print("lUlZ 4 L1f3 !!!!");*/
 }
 
 void handleInput(String input){
@@ -203,7 +203,7 @@ void handleInput(String input){
 
 void loop(){
   xMotorPos = servoX.read();
-  if(Serial.available()){
+  while(Serial.available()){
     handleInput(Serial.readString());
   }
 }
