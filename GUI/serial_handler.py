@@ -20,7 +20,7 @@ class SerialHandler():
 
 
 		self.waiting = True
-		self.serial.timeout = 2
+		self.serial.timeout = 4
 		self.listen()
 		self.serial.timeout = None
 

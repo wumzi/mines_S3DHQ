@@ -4,11 +4,8 @@
 import os
 import gphoto2 as gp
 
-class PhotoHandler:
-	def __init__(self, model=None, folder="data"):
-		if not os.path.exists(folder):
-			os.mkdir(folder)
-		self.folder = folder
+class CameraHandler:
+	def __init__(self, model=None):
 		self.model = model
 
 		if self.model == "canonEOS":
@@ -22,7 +19,7 @@ class PhotoHandler:
 		#Unix alternative with gphoto
 
 		#os.system("gphoto2 --capture-image-and-download --filename %s" % filename)
-		target = os.path.join(self.folder, filename)
+		target = filename
 
 		if self.model == "canonEOS":
 			file_path = gp.check_result(gp.gp_camera_capture(self.camera, gp.GP_CAPTURE_IMAGE, self.context))
