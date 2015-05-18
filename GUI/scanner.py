@@ -16,7 +16,7 @@ class ScannerHandler():
 			os.mkdir(folder)
 		os.chdir(folder)
 
-		self.camera = CameraHandler(model="canonEOS")
+		self.camera = CameraHandler(model="")
 		self.serial = SerialHandler(device, baudrate)
 
 		self.pause = False
@@ -37,8 +37,8 @@ class ScannerHandler():
 		self.already_photographed = list(set([tuple([int(x) for x in filename.split('_')[:2]]) for filename in os.listdir()]))
 		
 		for z in [z for z in range(91) if not z % 30]:
-			for x in [x for x in range(360) if not x % 30]:
-				while not self.pause:
+			for x in [x for x in range(360) if not x % 60]:
+				while self.pause:
 					time.sleep(1)
 
 				if (z, x) in self.already_photographed:
@@ -88,6 +88,6 @@ if __name__ == '__main__':
 	import sys
 
 	a = ScannerHandler()
-	a.set_lights(panneau1 = (200, 100, 200))
+	#a.set_lights(panneau1 = (200, 100, 200))
 	a.run_scan()
 	a.serial.close()

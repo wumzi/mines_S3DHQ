@@ -111,8 +111,6 @@ if __name__ == '__main__':
 
 	handler.laser(True)
 	handler.mesureAccelerometre()
-	handler.panneau(0, 255, 255, 255)
-	handler.commandeMoteurs(122, 122)
+	handler.panneau(0, 0, 0, 255)
+	handler.commandeMoteurs(59, 22)
 	handler.mesureAccelerometre()
-
-	handler.listener.join()
