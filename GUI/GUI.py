@@ -45,7 +45,7 @@ class Fenetre(Tk):
 		# Scanning subframe
 		scanSFrame = Frame(scanFrame)
 		breset = Button(scanSFrame,text="Reset",command=self.reset)
-		self.folderimg = PhotoImage(file="folder.gif").subsample(20,20)
+		self.folderimg = PhotoImage(file="includes/folder.gif").subsample(20,20)
 		bdir = Button(scanSFrame,command=self.directory,image=self.folderimg)
 		bscan = Button(scanFrame,text="Scan",width=8,command=self.scan)
 
@@ -70,7 +70,7 @@ class Fenetre(Tk):
 
 
 		#SCAN 3D HQ
-		self.scannerimg = PhotoImage(file="scanner.gif").subsample(1,1)
+		self.scannerimg = PhotoImage(file="includes/scanner.gif").subsample(1,1)
 		title=Label(mainFrame,image=self.scannerimg)
 
 
