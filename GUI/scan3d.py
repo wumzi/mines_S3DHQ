@@ -4,15 +4,18 @@ from os import getcwd
 import tkinter.ttk as ttk
 from scanner import ScannerHandler
 from threading import Thread
+import time
 
 
 
 class Fenetre(Tk):
 
 	def reset(self):
+		"""
 		self.posX["text"]=0
 		self.posY["text"]=0
 		self.posZ["text"]=0
+		"""
 		self.angH["text"]=0
 		self.angV["text"]=0
 
@@ -20,22 +23,6 @@ class Fenetre(Tk):
 	def directory(self):
 		self.where = askdirectory()
 
-	#Thread to to the scan
-	""""
-	class Scan(Thread):
-
-		def __init(self,where,red,green,blue):
-			Thread.__init__(self)
-			self.where=where
-			self.red=red
-			self.green=green
-			self.blue=blue
-
-		def run(self):
-			self.scanner=ScannerHandler(folder=self.where,rgb=(int(self.red),int(self.green),int(self.blue)))
-			self.scanner.run_scan()
-			self.scanner.serial.close()
-	"""
 	#Method lauched by the thread to run a scan
 	def scan(self):
 		self.scanner=ScannerHandler(folder=self.where,rgb=(int(self.redSBox.get()),int(self.greenSBox.get()),int(self.blueSBox.get())))
@@ -44,25 +31,36 @@ class Fenetre(Tk):
 
 	#Method for the button to run a scan
 	def runScan(self):
-		if self.fPause:
+		if self.fRun:
 			self.bscan["text"]="Pause"
-			self.fPause=False
+			self.fRun=False
 			self.thread = Thread(target=self.scan)
 			self.thread.start()
+			self.getPosition()
 		else:
 			if self.scanner.get_pause():
 				self.scanner.set_pause(False)
 				self.bscan["text"]="Pause"
+				self.getPosition()
 			else:
 				self.scanner.set_pause(True)
 				self.bscan["text"]="Scan"
+
+
+	#Method to get regularly the position of the scanner
+	
+	def getPosition(self):
+		while not self.scanner.get_pause():
+			self.angH["text"]=self.scanner.get_last_position()[0]
+			self.angV["text"]=self.scanner.get_last_position()[1]
+	
 
 	def __init__(self):
 		Tk.__init__(self)
 		#Pictures folder path
 		self.where = getcwd() + "/data"
-		#First pause in the scan
-		self.fPause = True
+		#First run in the scan
+		self.fRun = True
 		
 		#Main frame
 		mainFrame = Frame(self)
@@ -158,12 +156,14 @@ class Fenetre(Tk):
 		progressionFrame.pack(padx=20,fill=X)
 
 		#Information Bar
+		"""
 		posXLabel.pack(side="left",ipadx=2)
 		self.posX.pack(side="left",ipadx=2)
 		posYLabel.pack(side="left",ipadx=2)
 		self.posY.pack(side="left",ipadx=2)
 		posZLabel.pack(side="left",ipadx=2)
 		self.posZ.pack(side="left",ipadx=2)
+		"""
 		angHLabel.pack(side="left",ipadx=2)
 		self.angH.pack(side="left",ipadx=2)
 		angVLabel.pack(side="left",ipadx=2)
