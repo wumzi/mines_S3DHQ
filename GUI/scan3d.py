@@ -44,21 +44,25 @@ class Fenetre(Tk):
 
 	#Method for the button to run a scan
 	def runScan(self):
-		if self.Pause:
+		if self.fPause:
 			self.bscan["text"]="Pause"
+			self.fPause=False
 			self.thread = Thread(target=self.scan)
 			self.thread.start()
 		else:
-			self.bscan["text"]="Scan"
-			self.thread.pause
-
+			if self.scanner.get_pause():
+				self.scanner.set_pause(False)
+				self.bscan["text"]="Pause"
+			else:
+				self.scanner.set_pause(True)
+				self.bscan["text"]="Scan"
 
 	def __init__(self):
 		Tk.__init__(self)
 		#Pictures folder path
 		self.where = getcwd() + "/data"
 		#First pause in the scan
-		self.Pause = True
+		self.fPause = True
 		
 		#Main frame
 		mainFrame = Frame(self)
