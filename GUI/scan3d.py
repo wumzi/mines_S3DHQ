@@ -29,8 +29,8 @@ class Fenetre(Tk):
 		green = int(self.greenSBox.get())
 		blue = int(self.blueSBox.get())
 		self.scanner=ScannerHandler(folder=self.where,rgb=(red,green,blue),device="/dev/ttyACM1")
-		threadPosition = Thread(target=self.getPosition)
-		threadPosition.start()
+		threadStatus = Thread(target=self.getStatus)
+		threadStatus.start()
 		self.scanner.run_scan()
 		self.scanner.serial.close()
 
@@ -52,13 +52,14 @@ class Fenetre(Tk):
 
 	#Method to get regularly the position of the scanner
 	
-	def getPosition(self):
+	def getStatus(self):
 		while True:
 			time.sleep(0.01)
 			self.angH["text"]=self.scanner.get_last_position()[0]
 			self.angV["text"]=self.scanner.get_last_position()[1]
+			self.pBar["value"]=self.scanner.getProgression()
+			self.pLabel["text"] = str(self.scanner.getProgression()) + " %"
 
-	
 
 	def __init__(self):
 		Tk.__init__(self)
@@ -111,8 +112,8 @@ class Fenetre(Tk):
 
 
 		#Progress Bar
-		pBar = ttk.Progressbar(progressionFrame,orient="horizontal",mode="determinate")
-		pLabel = Label(progressionFrame,text="0%")
+		self.pBar = ttk.Progressbar(progressionFrame,orient="horizontal",mode="determinate")
+		self.pLabel = Label(progressionFrame,text="0%")
 
 		#Information Bar
 		posXLabel = Label(infoFrame,text="X :")
@@ -156,19 +157,12 @@ class Fenetre(Tk):
 		title.pack()
 
 		#Progress Bar
-		pBar.pack(pady=10,fill=BOTH,padx=10)
-		pLabel.pack(side="right")
+		self.pBar.pack(pady=10,fill=BOTH,padx=10)
+		self.pLabel.pack(side="right")
 		progressionFrame.pack(padx=20,fill=X)
 
 		#Information Bar
-		"""
-		posXLabel.pack(side="left",ipadx=2)
-		self.posX.pack(side="left",ipadx=2)
-		posYLabel.pack(side="left",ipadx=2)
-		self.posY.pack(side="left",ipadx=2)
-		posZLabel.pack(side="left",ipadx=2)
-		self.posZ.pack(side="left",ipadx=2)
-		"""
+
 		angHLabel.pack(side="left",ipadx=2)
 		self.angH.pack(side="left",ipadx=2)
 		angVLabel.pack(side="left",ipadx=2)
