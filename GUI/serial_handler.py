@@ -13,7 +13,7 @@ class FrameBrokenException(Exception):
 	pass
 
 class SerialHandler():
-	def __init__(self, device="/dev/ttyACM0", baudrate="9600"):
+	def __init__(self, device="/dev/ttyACM0", baudrate="115200"):
 		self.serial = serial.Serial(device, baudrate)
 		self.serial.flushInput()
 		self.serial.flushOutput()

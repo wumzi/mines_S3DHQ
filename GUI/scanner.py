@@ -14,9 +14,11 @@ class ScannerHandler():
 
 	X_POS = 60
 	Z_POS = 30
-	counter = None
+	already_photographed = None
+	last_position = (None, None)
+	pause = False
 
-	def __init__(self, rgb=(255, 255, 255), folder="data", device="/dev/ttyACM0", baudrate="9600"):
+	def __init__(self, rgb=(255, 255, 255), folder="data", device="/dev/ttyACM0", baudrate="115200"):
 		if not os.path.exists(folder):
 			os.mkdir(folder)
 		os.chdir(folder)
@@ -25,7 +27,6 @@ class ScannerHandler():
 		self.serial = SerialHandler(device, baudrate)
 
 		self.pause = False
-
 		self.last_position = (0, 0)
 
 		self.panneau1 = self.panneau2 = self.panneau3 =(0, 0, 0)
@@ -41,7 +42,6 @@ class ScannerHandler():
 	def run_scan(self, filenametpl=FILENAMETPL):
 		self.already_photographed = list(set([tuple([int(x) for x in filename.split('_')[:2]]) for filename in os.listdir()]))
 		
-		self.counter = 0
 		for z in [z for z in range(91) if not z % self.Z_POS]:
 			for x in [x for x in range(360) if not x % self.X_POS]:
 				while self.pause:
@@ -60,7 +60,7 @@ class ScannerHandler():
 				self.serial.laser(False)
 
 				self.already_photographed.append((z, x))
-				self.counter += 1
+				
 
 
 	def reach_position(self, z, x):
@@ -92,14 +92,21 @@ class ScannerHandler():
 	def getProgression(self):
 		xsteps = 360 / self.X_POS
 		zsteps = 91 / self.Z_POS
-		return float(self.counter) / (xsteps * zsteps)
+		return float(len(self.already_photographed)) / (xsteps * zsteps)
 
 
+
+def printposition(scanner):
+	while True:
+		print(scanner.get_last_position())
+		time.sleep(0.1)
 
 if __name__ == '__main__':
 	import sys
+	import threading
+
 
 	a = ScannerHandler()
-	#a.set_lights(panneau1 = (200, 100, 200))
+	a.set_lights(panneau1 = (200, 100, 200))
 	a.run_scan()
 	a.serial.close()

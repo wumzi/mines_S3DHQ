@@ -98,7 +98,7 @@ void setup(){
   /*lcd.init();
   lcd.backlight();*/
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("$OK_ready/");
 
   //Initialisation variables capteurs
