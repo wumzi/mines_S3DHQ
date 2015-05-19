@@ -37,4 +37,4 @@ class CameraHandler:
 
 if __name__ == '__main__':
 	p = CameraHandler(model="canonEOS")
-	p.takePicture()
+	p.take_picture()

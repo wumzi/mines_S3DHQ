@@ -74,11 +74,20 @@ class SerialHandler():
 
 	def mesureAccelerometre(self):
 		resp = self.sendMessage(CODEACTION["accelerometre"])
-		return [float(x) for x in resp]
+		try:
+			return [float(x) for x in resp]
+		except Exception(e):
+			print(e)
+			return None
+
 
 	def mesureLumiere(self):
 		resp = self.sendMessage(CODEACTION["mesure_lumiere"])
-		return sum([int(x) for x in resp])
+		try:
+			return sum([int(x) for x in resp])
+		except Exception(e):
+			print(e)
+			return None
 
 	def handleMessage(self, message):
 		if message[0] != "$" or "/" not in message[-3:]:

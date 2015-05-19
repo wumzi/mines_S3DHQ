@@ -18,12 +18,12 @@ class ScannerHandler():
 	last_position = (None, None)
 	pause = False
 
-	def __init__(self, rgb=(255, 255, 255), folder="data", device="/dev/ttyACM0", baudrate="115200"):
+	def __init__(self, rgb=(255, 255, 255), folder="data", device="/dev/ttyACM1", baudrate="115200"):
 		if not os.path.exists(folder):
 			os.mkdir(folder)
 		os.chdir(folder)
 
-		self.camera = CameraHandler(model="")
+		self.camera = CameraHandler(model="canonEOS")
 		self.serial = SerialHandler(device, baudrate)
 
 		self.pause = False
