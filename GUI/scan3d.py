@@ -28,7 +28,7 @@ class Fenetre(Tk):
 		red = int(self.redSBox.get())
 		green = int(self.greenSBox.get())
 		blue = int(self.blueSBox.get())
-		self.scanner=ScannerHandler(folder=self.where,rgb=(red,green,blue),device="/dev/ttyACM1")
+		self.scanner=ScannerHandler(folder=self.where,rgb=(red,green,blue),device="/dev/ttyACM0")
 		threadStatus = Thread(target=self.getStatus)
 		threadStatus.start()
 		self.scanner.run_scan()
