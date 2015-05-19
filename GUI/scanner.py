@@ -96,14 +96,8 @@ class ScannerHandler():
 
 
 
-def printposition(scanner):
-	while True:
-		print(scanner.get_last_position())
-		time.sleep(0.1)
-
 if __name__ == '__main__':
 	import sys
-	import threading
 
 
 	a = ScannerHandler()
