@@ -3,6 +3,7 @@ from tkinter.filedialog import askdirectory
 from os import getcwd
 import tkinter.ttk as ttk
 from scanner import ScannerHandler
+from threading import Thread
 
 
 
@@ -19,18 +20,46 @@ class Fenetre(Tk):
 	def directory(self):
 		self.where = askdirectory()
 
+	#Thread to to the scan
+	""""
+	class Scan(Thread):
+
+		def __init(self,where,red,green,blue):
+			Thread.__init__(self)
+			self.where=where
+			self.red=red
+			self.green=green
+			self.blue=blue
+
+		def run(self):
+			self.scanner=ScannerHandler(folder=self.where,rgb=(int(self.red),int(self.green),int(self.blue)))
+			self.scanner.run_scan()
+			self.scanner.serial.close()
+	"""
+	#Method lauched by the thread to run a scan
 	def scan(self):
 		self.scanner=ScannerHandler(folder=self.where,rgb=(int(self.redSBox.get()),int(self.greenSBox.get()),int(self.blueSBox.get())))
 		self.scanner.run_scan()
-		#self.scanner.serial.close()
+		self.scanner.serial.close()
+
+	#Method for the button to run a scan
+	def runScan(self):
+		if self.Pause:
+			self.bscan["text"]="Pause"
+			self.thread = Thread(target=self.scan)
+			self.thread.start()
+		else:
+			self.bscan["text"]="Scan"
+			self.thread.pause
 
 
 	def __init__(self):
 		Tk.__init__(self)
 		#Pictures folder path
 		self.where = getcwd() + "/data"
-		#self.scanner=ScannerHandler()
-
+		#First pause in the scan
+		self.Pause = True
+		
 		#Main frame
 		mainFrame = Frame(self)
 		#Frame for scanning frame and light frame
@@ -47,7 +76,7 @@ class Fenetre(Tk):
 		breset = Button(scanSFrame,text="Reset",command=self.reset)
 		self.folderimg = PhotoImage(file="includes/folder.gif").subsample(20,20)
 		bdir = Button(scanSFrame,command=self.directory,image=self.folderimg)
-		bscan = Button(scanFrame,text="Scan",width=8,command=self.scan)
+		self.bscan = Button(scanFrame,text="Scan",width=8,command=self.runScan)
 
 		
 		#Light frame RGB
@@ -99,7 +128,7 @@ class Fenetre(Tk):
 		breset.pack(side="left")
 		bdir.pack(side="right")
 		scanSFrame.pack()
-		bscan.pack(side="left")		
+		self.bscan.pack(side="left")		
 		scanFrame.pack(side="left",padx=10)
 
 		#LightFrame
