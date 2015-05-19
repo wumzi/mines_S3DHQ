@@ -25,7 +25,12 @@ class Fenetre(Tk):
 
 	#Method lauched by the thread to run a scan
 	def scan(self):
-		self.scanner=ScannerHandler(folder=self.where,rgb=(int(self.redSBox.get()),int(self.greenSBox.get()),int(self.blueSBox.get())))
+		red = int(self.redSBox.get())
+		green = int(self.greenSBox.get())
+		blue = int(self.blueSBox.get())
+		self.scanner=ScannerHandler(folder=self.where,rgb=(red,green,blue),device="/dev/ttyACM1")
+		threadPosition = Thread(target=self.getPosition)
+		threadPosition.start()
 		self.scanner.run_scan()
 		self.scanner.serial.close()
 
@@ -34,14 +39,12 @@ class Fenetre(Tk):
 		if self.fRun:
 			self.bscan["text"]="Pause"
 			self.fRun=False
-			self.thread = Thread(target=self.scan)
-			self.thread.start()
-			self.getPosition()
+			thread = Thread(target=self.scan)
+			thread.start()
 		else:
 			if self.scanner.get_pause():
 				self.scanner.set_pause(False)
 				self.bscan["text"]="Pause"
-				self.getPosition()
 			else:
 				self.scanner.set_pause(True)
 				self.bscan["text"]="Scan"
@@ -50,9 +53,11 @@ class Fenetre(Tk):
 	#Method to get regularly the position of the scanner
 	
 	def getPosition(self):
-		while not self.scanner.get_pause():
+		while True:
+			time.sleep(0.01)
 			self.angH["text"]=self.scanner.get_last_position()[0]
 			self.angV["text"]=self.scanner.get_last_position()[1]
+
 	
 
 	def __init__(self):
