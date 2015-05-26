@@ -5,17 +5,14 @@ import tkinter.ttk as ttk
 from scanner import ScannerHandler
 from threading import Thread
 import time
+from colorpanel import LightFrame
 
 
 
 class Fenetre(Tk):
 
 	def reset(self):
-		"""
-		self.posX["text"]=0
-		self.posY["text"]=0
-		self.posZ["text"]=0
-		"""
+		
 		self.angH["text"]=0
 		self.angV["text"]=0
 
@@ -25,11 +22,11 @@ class Fenetre(Tk):
 
 	#Method lauched by the thread to run a scan
 	def scan(self):
-		red = int(self.redSBox.get())
-		green = int(self.greenSBox.get())
-		blue = int(self.blueSBox.get())
-		self.scanner=ScannerHandler(folder=self.where,rgb=(red,green,blue),device="/dev/ttyACM1")
-		threadStatus = Thread(target=self.getStatus)
+		red = int(self.redSBox.get()) % 255
+		green = int(self.greenSBox.get()) % 255
+		blue = int(self.blueSBox.get()) % 255
+		self.scanner=ScannerHandler(folder=self.where,device="/dev/ttyACM0")
+		threadStatus = Thread(target=self.updateStatus)
 		threadStatus.start()
 		self.scanner.run_scan()
 		self.scanner.serial.close()
@@ -52,13 +49,17 @@ class Fenetre(Tk):
 
 	#Method to get regularly the position of the scanner
 	
-	def getStatus(self):
+	def updateStatus(self):
 		while True:
 			time.sleep(0.01)
+			#Angular positions
 			self.angH["text"]=self.scanner.get_last_position()[0]
 			self.angV["text"]=self.scanner.get_last_position()[1]
+			#Scan progression
 			self.pBar["value"]=self.scanner.getProgression()
-			self.pLabel["text"] = str(self.scanner.getProgression()) + " %"
+			self.pLabel["text"] = str(round(self.scanner.getProgression(),2)) + " %"
+			#Change colors of panels
+			self.scanner.set_lights(lightFrame1.getValues(),lightFrame2.getValues(),lightFrame3.getValues())
 
 
 	def __init__(self):
@@ -86,24 +87,10 @@ class Fenetre(Tk):
 		bdir = Button(scanSFrame,command=self.directory,image=self.folderimg)
 		self.bscan = Button(scanFrame,text="Scan",width=8,command=self.runScan)
 
-		
 		#Light frame RGB
-		lightFrame = Frame(f1)
-		#Light frame label
-		lightLabel = Label(lightFrame,text="Contrôle des LED")
-		#Frame for the colors
-		colorsFrame = Frame(lightFrame)
-		#Frame for the values of RBG
-		valuesFrame = Frame(lightFrame)
-
-		#Labels for the colors
-		redLabel = Label(colorsFrame,text="Rouge")
-		greenLabel = Label(colorsFrame,text="Vert")
-		blueLabel = Label(colorsFrame,text="Bleu")
-		#Spinboxes for the values of RGB
-		self.redSBox = Spinbox(valuesFrame, from_=0, to=255,width=3)
-		self.greenSBox = Spinbox(valuesFrame, from_=0, to=255,width=3)
-		self.blueSBox = Spinbox(valuesFrame, from_=0, to=255,width=3)
+		lightFrame1 = LightFrame(f1,"Panneau 1")
+		lightFrame2 = LightFrame(f1,"Panneau 2")
+		lightFrame3 = LightFrame(f1,"Panneau 3")
 
 
 		#SCAN 3D HQ
@@ -140,18 +127,10 @@ class Fenetre(Tk):
 		scanFrame.pack(side="left",padx=10)
 
 		#LightFrame
-		lightLabel.pack(side="top")
-		redLabel.pack()
-		greenLabel.pack()
-		blueLabel.pack()
-		colorsFrame.pack(side="left")
 
-		self.redSBox.pack()
-		self.greenSBox.pack()
-		self.blueSBox.pack()
-		valuesFrame.pack(side="right")
-
-		lightFrame.pack(side="right",padx=10)
+		lightFrame1.pack(side="left",padx=10)
+		lightFrame2.pack(side="left",padx=10)
+		lightFrame3.pack(side="left",padx=10)
 
 		#Title SCANNER 3D HQ
 		title.pack()
