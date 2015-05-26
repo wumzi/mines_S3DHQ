@@ -10,6 +10,7 @@ from serial_handler import SerialHandler
 
 FILENAMETPL = "{}_{}_{}_{}.jpg"
 
+
 class ScannerHandler():
 
 	X_POS = 60
@@ -29,8 +30,7 @@ class ScannerHandler():
 		self.pause = False
 		self.last_position = (0, 0)
 
-		self.panneau1 = self.panneau2 = self.panneau3 =(0, 0, 0)
-		self.set_lights(rgb, rgb, rgb)
+		self.panneau1 = self.panneau2 = self.panneau3 = (0, 0, 0)
 
 
 	def take_picture(self, filename, laser=False):
