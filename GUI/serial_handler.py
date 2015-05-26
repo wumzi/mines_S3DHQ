@@ -19,23 +19,24 @@ class SerialHandler():
 		self.serial.flushOutput()
 
 
-		self.waiting = True
+		#For slow cards : wait in case of a reboot with reboot message
 		self.serial.timeout = 4
-		self.listen()
+		self.serial.readline()
 		self.serial.timeout = None
+
+		self.serial_lock = threading.Lock()
+
 
 	def listen(self):
 		input = self.serial.readline().decode(encoding="utf-8")
-		self.waiting = False
+		self.serial_lock.release()
 		if input:
 			print("INPUT : " + input)
 			return self.handleMessage(input)
 
 	def sendMessage(self, messageBrut):
+		self.serial_lock.acquire()
 		messageBrut = "$" + str(messageBrut) + "/"
-		while self.waiting:
-			time.sleep(0.01)
-		self.waiting = True
 		self.serial.write(bytes(messageBrut, encoding="utf-8"))
 		print("OUTPUT : " + messageBrut)
 
