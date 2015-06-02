@@ -1,11 +1,14 @@
 from tkinter import *
 from tkinter.filedialog import askdirectory
 from os import getcwd
+from os import listdir
 import tkinter.ttk as ttk
 from scanner import ScannerHandler
 from threading import Thread
 import time
 from colorpanel import LightFrame
+import re
+from PIL import Image, ImageTk
 
 
 
@@ -22,11 +25,14 @@ class Fenetre(Tk):
 
 	#Method lauched by the thread to run a scan
 	def scan(self):
-		red = int(self.redSBox.get()) % 255
-		green = int(self.greenSBox.get()) % 255
-		blue = int(self.blueSBox.get()) % 255
 		self.scanner=ScannerHandler(folder=self.where,device="/dev/ttyACM0")
+
+		#Initialize subWindow to show the pictures
+		self.subWindow = Toplevel(self)
+		self.subWindow.destroy()
+
 		threadStatus = Thread(target=self.updateStatus)
+		threadStatus.daemon = True
 		threadStatus.start()
 		self.scanner.run_scan()
 		self.scanner.serial.close()
@@ -37,6 +43,7 @@ class Fenetre(Tk):
 			self.bscan["text"]="Pause"
 			self.fRun=False
 			thread = Thread(target=self.scan)
+			thread.daemon = True
 			thread.start()
 		else:
 			if self.scanner.get_pause():
@@ -53,13 +60,30 @@ class Fenetre(Tk):
 		while True:
 			time.sleep(0.01)
 			#Angular positions
-			self.angH["text"]=self.scanner.get_last_position()[0]
-			self.angV["text"]=self.scanner.get_last_position()[1]
+			v = self.scanner.get_last_position()[0]
+			h = self.scanner.get_last_position()[1]
+			self.angH["text"]= h
+			self.angV["text"]= v
 			#Scan progression
 			self.pBar["value"]=self.scanner.getProgression()
 			self.pLabel["text"] = str(round(self.scanner.getProgression(),2)) + " %"
 			#Change colors of panels
-			self.scanner.set_lights(lightFrame1.getValues(),lightFrame2.getValues(),lightFrame3.getValues())
+			self.scanner.set_lights(self.lightFrame1.getValues(),self.lightFrame2.getValues(),self.lightFrame3.getValues())
+
+			#Update the picture (destroy and build the subWindow back)
+			if listdir(self.where):
+				regex = str(h) + "_" + str(v) + "*_False.jpg$"
+				lastPicture = [item for item in listdir(self.where) if re.search(regex,item)]
+				if lastPicture:
+					pic = lastPicture[0]
+					img = Image.open(file=self.where+"/"+pic).subsample(1,1)
+					lastImage["image"]=ImageTk.PhotoImage(img)
+					if self.subWindow:
+						self.subWindow.destroy()
+					self.subWindow = Toplevel(self)
+					lab = Label(self.subWindow,image=img)
+					lab.pack()
+
 
 
 	def __init__(self):
@@ -88,9 +112,9 @@ class Fenetre(Tk):
 		self.bscan = Button(scanFrame,text="Scan",width=8,command=self.runScan)
 
 		#Light frame RGB
-		lightFrame1 = LightFrame(f1,"Panneau 1")
-		lightFrame2 = LightFrame(f1,"Panneau 2")
-		lightFrame3 = LightFrame(f1,"Panneau 3")
+		self.lightFrame1 = LightFrame(f1,"Panneau 1")
+		self.lightFrame2 = LightFrame(f1,"Panneau 2")
+		self.lightFrame3 = LightFrame(f1,"Panneau 3")
 
 
 		#SCAN 3D HQ
@@ -128,9 +152,9 @@ class Fenetre(Tk):
 
 		#LightFrame
 
-		lightFrame1.pack(side="left",padx=10)
-		lightFrame2.pack(side="left",padx=10)
-		lightFrame3.pack(side="left",padx=10)
+		self.lightFrame1.pack(side="left",padx=10)
+		self.lightFrame2.pack(side="left",padx=10)
+		self.lightFrame3.pack(side="left",padx=10)
 
 		#Title SCANNER 3D HQ
 		title.pack()
